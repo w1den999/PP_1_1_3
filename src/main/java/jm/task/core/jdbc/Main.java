@@ -9,7 +9,7 @@ public class Main {
     public static void main(String[] args) throws SQLException {
         UserService userService = new UserServiceImpl();
         userService.createUsersTable();
-        userService.saveUser("Ivann", "Ivanov", (byte) 22);
+        userService.saveUser("Ivan", "Ivanov", (byte) 22);
         userService.saveUser("Egor", "Egorov", (byte) 27);
         userService.saveUser("Petr", "Petrov", (byte) 34);
         userService.saveUser("Yan", "Bobrov", (byte) 50);
