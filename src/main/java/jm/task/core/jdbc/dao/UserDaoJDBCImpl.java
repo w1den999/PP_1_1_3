@@ -8,69 +8,93 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
-    Connection connection = Util.getConnection();
+    private final Connection connection = Util.getConnection();
+
+    public UserDaoJDBCImpl() {
+
+    }
+
     public void createUsersTable() {
-        try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS users" +
-                    "(id mediumint not null auto_increment," +
-                    " name VARCHAR(50), " +
-                    "lastname VARCHAR(50), " +
-                    "age tinyint, " +
-                    "PRIMARY KEY (id))");
+
+        String sql = "CREATE TABLE IF NOT EXISTS Users (id BIGINT AUTO_INCREMENT, " +
+                "name VARCHAR(255) NOT NULL, " +
+                "lastName VARCHAR(255) NOT NULL, " +
+                "age TINYINT NOT NULL, " +
+                "PRIMARY KEY (id));";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.executeUpdate();
+
         } catch (SQLException e) {
-            e.printStackTrace();
-        }
+            e.printStackTrace();        }
+
     }
+
     public void dropUsersTable() {
-        try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate("Drop table if exists users");
+        String sql = "DROP TABLE IF EXISTS Users;";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.executeUpdate();
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    public void saveUser(String name, String lastName, byte age)  {
-        String sql = "INSERT INTO test.users(name, lastname, age) VALUES(?,?,?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, name);
-            preparedStatement.setString(2, lastName);
-            preparedStatement.setByte(3, age);
-            preparedStatement.executeUpdate();
+
+    public void saveUser(String name, String lastName, byte age) {
+        String sql = "INSERT INTO Users(name, lastname, age)" +
+                "VALUES (?, ?, ?);";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, name);
+            statement.setString(2, lastName);
+            statement.setByte(3, age);
+            statement.executeUpdate();
+
         } catch (SQLException e) {
-            e.printStackTrace();
-        }
+            e.printStackTrace();        }
+
     }
+
     public void removeUserById(long id) {
-        String sql = "DELETE FROM users where id";
-        try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate(sql);
+        String sql = "DELETE FROM Users WHERE id = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, id);
+            statement.executeUpdate();
+
         } catch (SQLException e) {
-            e.printStackTrace();
-        }
+            e.printStackTrace();        }
     }
+
     public List<User> getAllUsers() {
-        List<User> allUser = new ArrayList<>();
-        String sql = "SELECT id, name, lastname, age from users";
-        try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(sql);
+        List<User> list = new ArrayList<>();
+        String sql = "SELECT * FROM Users;";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 User user = new User();
                 user.setId(resultSet.getLong("id"));
                 user.setName(resultSet.getString("name"));
                 user.setLastName(resultSet.getString("lastname"));
                 user.setAge(resultSet.getByte("age"));
-                allUser.add(user);
+                list.add(user);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return allUser;
+            e.printStackTrace();        }
+        return list;
     }
+
     public void cleanUsersTable() {
-        String sql = "DELETE FROM users";
-        try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate(sql);
+        String sql = "TRUNCATE TABLE Users;";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.executeUpdate();
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
     }
 }
