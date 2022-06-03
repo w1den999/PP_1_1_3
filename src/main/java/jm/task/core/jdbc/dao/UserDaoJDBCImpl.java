@@ -8,7 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
-    private final Connection connection = Util.getConnection();
+    private  final Connection connection ;
+    public UserDaoJDBCImpl() {
+       connection = Util.getConnection();
+    }
 
     public void createUsersTable() {
 
@@ -20,9 +23,12 @@ public class UserDaoJDBCImpl implements UserDao {
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.executeUpdate();
+            connection.commit();
+
 
         } catch (SQLException e) {
-            e.printStackTrace();        }
+                e.printStackTrace();
+        }
 
     }
 
@@ -31,6 +37,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.executeUpdate();
+            connection.commit();
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -40,16 +47,17 @@ public class UserDaoJDBCImpl implements UserDao {
     public void saveUser(String name, String lastName, byte age) {
         String sql = "INSERT INTO Users(name, lastname, age)" +
                 "VALUES (?, ?, ?);";
-
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (PreparedStatement statement = connection.prepareStatement(sql)){
 
             statement.setString(1, name);
             statement.setString(2, lastName);
             statement.setByte(3, age);
             statement.executeUpdate();
+            connection.commit();
 
         } catch (SQLException e) {
-            e.printStackTrace();        }
+            e.printStackTrace();
+        }
 
     }
 
@@ -59,6 +67,7 @@ public class UserDaoJDBCImpl implements UserDao {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             statement.executeUpdate();
+            connection.commit();
 
         } catch (SQLException e) {
             e.printStackTrace();        }
@@ -76,6 +85,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 user.setLastName(resultSet.getString("lastname"));
                 user.setAge(resultSet.getByte("age"));
                 list.add(user);
+                connection.commit();
             }
         } catch (SQLException e) {
             e.printStackTrace();        }
@@ -87,8 +97,9 @@ public class UserDaoJDBCImpl implements UserDao {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.executeUpdate();
-
+            connection.commit();
         } catch (SQLException e) {
+
             e.printStackTrace();
         }
 

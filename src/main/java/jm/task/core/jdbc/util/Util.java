@@ -10,12 +10,16 @@ public class Util {
     private static final String PASSWORD = "1997";
     public static Connection connection;
     public static Connection getConnection() {
-        try {
-            connection = DriverManager.getConnection(HOST, USERNAME, PASSWORD);
 
+        try {
+            if (connection == null) {
+                connection = DriverManager.getConnection(HOST, USERNAME, PASSWORD);
+                connection.setAutoCommit(false);
+            }
+            return connection;
         } catch (SQLException e) {
-            System.out.println("No connection");
+            throw new RuntimeException(e);
         }
-        return connection;
     }
+
 }
